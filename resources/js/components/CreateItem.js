@@ -6,44 +6,57 @@ import {browserHistory} from 'react-router';
 class CreateItem extends Component {
   constructor(props) {
     super(props);
-    this.state = {name: '', password: '', emailID: '', contact: ''};
-
-    this.handleNameChange = this.handleNameChange.bind(this);
-    this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    this.handleEmailChange = this.handleEmailChange.bind(this);
-    this.handleContactChange = this.handleContactChange.bind(this);
+    this.state = {formData:{}, errors:{}};
+    this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
-  handleNameChange(e) {
-    this.setState({name: e.target.value})
-
-  }
-  handlePasswordChange(e) {
-    this.setState({password: e.target.value})
-  }
-  handleEmailChange(e) {
-    this.setState({emailID: e.target.value})
-  }
-  handleContactChange(e) {
-    this.setState({contact: e.target.value})
+  
+  handleChange(event){
+    let {formData, errors} = this.state;
+    const { name, value } = event.target;
+    formData[name] = value
+    this.setState({formData,errors})
   }
 
   handleSubmit(e) {
     e.preventDefault();
-    
-    const data = {
-      name: this.state.name,
-      email: this.state.emailID,
-      password: this.state.password,
-      contact: this.state.contact
+    let errors = this.isValid();
+    this.setState({errors:errors})
+    if(errors.name==true && errors.email==true && errors.password==true && errors.contact==true){
+      let uri = "http://localhost:8000/addStudent";
+      axios.post(uri, this.state.formData).then((response) => {
+        browserHistory.push('/display-item');
+      });
     }
-    let uri = "http://localhost:8000/addStudent";
-    axios.post(uri, data).then((response) => {
-      browserHistory.push('/display-item');
+  }
+
+  isValid() {
+    let requires = [
+      'name',
+      'email',
+      'password',
+      'contact',
+    ];
+    let {formData, errors} = this.state;
+    let keys = Object.keys(formData);
+    requires.forEach(each => {
+      if (
+        keys.indexOf(each) === -1 ||
+        formData[each] == null ||
+        typeof formData[each] === 'undefined' ||
+        formData[each] === ''
+      ) {
+        errors[each] = 'field is required';
+      } else {
+        errors[each] = true;
+      }
     });
+    return errors;
   }
 
     render() {
+      let {formData, errors} = this.state;
+     
       return (
       <div>
         <h1>Create An Item</h1>
@@ -52,7 +65,8 @@ class CreateItem extends Component {
             <div className="col-md-6">
               <div className="form-group">
                 <label>User Name:</label>
-                <input type="text" className="form-control" onChange={this.handleNameChange} />
+                <input type="text" name="name" className="form-control" value={formData.name || ''}  onChange={this.handleChange} />
+                <span>{errors.name}</span>
               </div>
             </div>
             </div>
@@ -60,7 +74,8 @@ class CreateItem extends Component {
               <div className="col-md-6">
                 <div className="form-group">
                   <label>Password:</label>
-                  <input type="password" className="form-control" onChange={this.handlePasswordChange} />
+                  <input type="password" name="password" className="form-control" value={formData.password || ''} onChange={this.handleChange} />
+                  <span>{errors.password}</span>
                 </div>
               </div>
             </div>
@@ -68,7 +83,8 @@ class CreateItem extends Component {
               <div className="col-md-6">
                 <div className="form-group">
                   <label>Email-ID:</label>
-                  <input type="email" className="form-control" onChange={this.handleEmailChange} />
+                  <input type="email" name="email" className="form-control" value={formData.email || ''} onChange={this.handleChange} />
+                  <span>{errors.email}</span>
                 </div>
               </div>
             </div>
@@ -76,7 +92,8 @@ class CreateItem extends Component {
               <div className="col-md-6">
                 <div className="form-group">
                   <label>Contact:</label>
-                  <input type="text" maxLength="10" className="form-control" onChange={this.handleContactChange} />
+                  <input type="text" name="contact" maxLength="10" className="form-control" value={formData.contact || ''} onChange={this.handleChange} />
+                  <span>{errors.contact}</span>
                 </div>
               </div>
             </div><br />

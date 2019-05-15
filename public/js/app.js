@@ -68858,65 +68858,68 @@ function (_Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(CreateItem).call(this, props));
     _this.state = {
-      name: '',
-      password: '',
-      emailID: '',
-      contact: ''
+      formData: {},
+      errors: {}
     };
-    _this.handleNameChange = _this.handleNameChange.bind(_assertThisInitialized(_this));
-    _this.handlePasswordChange = _this.handlePasswordChange.bind(_assertThisInitialized(_this));
-    _this.handleEmailChange = _this.handleEmailChange.bind(_assertThisInitialized(_this));
-    _this.handleContactChange = _this.handleContactChange.bind(_assertThisInitialized(_this));
+    _this.handleChange = _this.handleChange.bind(_assertThisInitialized(_this));
     _this.handleSubmit = _this.handleSubmit.bind(_assertThisInitialized(_this));
     return _this;
   }
 
   _createClass(CreateItem, [{
-    key: "handleNameChange",
-    value: function handleNameChange(e) {
+    key: "handleChange",
+    value: function handleChange(event) {
+      var _this$state = this.state,
+          formData = _this$state.formData,
+          errors = _this$state.errors;
+      var _event$target = event.target,
+          name = _event$target.name,
+          value = _event$target.value;
+      formData[name] = value;
       this.setState({
-        name: e.target.value
-      });
-    }
-  }, {
-    key: "handlePasswordChange",
-    value: function handlePasswordChange(e) {
-      this.setState({
-        password: e.target.value
-      });
-    }
-  }, {
-    key: "handleEmailChange",
-    value: function handleEmailChange(e) {
-      this.setState({
-        emailID: e.target.value
-      });
-    }
-  }, {
-    key: "handleContactChange",
-    value: function handleContactChange(e) {
-      this.setState({
-        contact: e.target.value
+        formData: formData,
+        errors: errors
       });
     }
   }, {
     key: "handleSubmit",
     value: function handleSubmit(e) {
       e.preventDefault();
-      var data = {
-        name: this.state.name,
-        email: this.state.emailID,
-        password: this.state.password,
-        contact: this.state.contact
-      };
-      var uri = "http://localhost:8000/addStudent";
-      axios.post(uri, data).then(function (response) {
-        react_router__WEBPACK_IMPORTED_MODULE_1__["browserHistory"].push('/display-item');
+      var errors = this.isValid();
+      this.setState({
+        errors: errors
       });
+
+      if (errors.name == true && errors.email == true && errors.password == true && errors.contact == true) {
+        var uri = "http://localhost:8000/addStudent";
+        axios.post(uri, this.state.formData).then(function (response) {
+          react_router__WEBPACK_IMPORTED_MODULE_1__["browserHistory"].push('/display-item');
+        });
+      }
+    }
+  }, {
+    key: "isValid",
+    value: function isValid() {
+      var requires = ['name', 'email', 'password', 'contact'];
+      var _this$state2 = this.state,
+          formData = _this$state2.formData,
+          errors = _this$state2.errors;
+      var keys = Object.keys(formData);
+      requires.forEach(function (each) {
+        if (keys.indexOf(each) === -1 || formData[each] == null || typeof formData[each] === 'undefined' || formData[each] === '') {
+          errors[each] = 'field is required';
+        } else {
+          errors[each] = true;
+        }
+      });
+      return errors;
     }
   }, {
     key: "render",
     value: function render() {
+      var _this$state3 = this.state,
+          formData = _this$state3.formData,
+          errors = _this$state3.errors;
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", null, "Create An Item"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", {
         onSubmit: this.handleSubmit
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -68927,9 +68930,11 @@ function (_Component) {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "User Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         type: "text",
+        name: "name",
         className: "form-control",
-        onChange: this.handleNameChange
-      })))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        value: formData.name || '',
+        onChange: this.handleChange
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, errors.name)))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-6"
@@ -68937,9 +68942,11 @@ function (_Component) {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "Password:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         type: "password",
+        name: "password",
         className: "form-control",
-        onChange: this.handlePasswordChange
-      })))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        value: formData.password || '',
+        onChange: this.handleChange
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, errors.password)))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-6"
@@ -68947,9 +68954,11 @@ function (_Component) {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "Email-ID:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         type: "email",
+        name: "email",
         className: "form-control",
-        onChange: this.handleEmailChange
-      })))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        value: formData.email || '',
+        onChange: this.handleChange
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, errors.email)))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-6"
@@ -68957,10 +68966,12 @@ function (_Component) {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, "Contact:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         type: "text",
+        name: "contact",
         maxLength: "10",
         className: "form-control",
-        onChange: this.handleContactChange
-      })))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        value: formData.contact || '',
+        onChange: this.handleChange
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, errors.contact)))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "form-group"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary"
@@ -69371,8 +69382,8 @@ function (_Component) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /var/www/html/ReactDemo/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /var/www/html/ReactDemo/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /var/www/html/ReactCrud/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /var/www/html/ReactCrud/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
